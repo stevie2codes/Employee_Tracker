@@ -30,3 +30,9 @@ VALUES ('Stephen', 'Webb');
 
 INSERT INTO employee (first_name, last_name)
 VALUES ('Robert', 'Paulson');
+
+INSERT INTO employee (first_name, last_name)
+VALUES ('Tyler', 'Durden');
+
+INSERT INTO employee (first_name, last_name)
+VALUES ('Marla', 'Singer');
