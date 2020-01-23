@@ -1,0 +1,25 @@
+{
+  "name": "employee_tracker",
+  "version": "1.0.0",
+  "description": "A solution for managing a company's employees using node, inquirer, and MySQL.",
+  "main": "tracker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevie2codes/Employee_Tracker.git"
+  },
+  "author": "stephen webb",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stevie2codes/Employee_Tracker/issues"
+  },
+  "homepage": "https://github.com/stevie2codes/Employee_Tracker#readme",
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "console.table": "^0.10.0",
+    "inquirer": "^7.0.3",
+    "mysql": "^2.18.0"
+  }
+}
