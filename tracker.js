@@ -4,14 +4,14 @@ const chalk = require("chalk");
 const cTable = require("console.table");
 const chalkTable = chalk.bold.bgGreenBright.red;
 
-const connection = mysql.createConnection({ 
+const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
-  user: "root",             //connecting to DataBase
+  user: "root", //connecting to DataBase
   password: "$Webb001",
   database: "Employee_Tracker"
 });
-    // IF (connection) start program
+// IF (connection) start program
 connection.connect(err => {
   if (err) throw err;
   start();
@@ -71,7 +71,7 @@ function start() {
     });
 }
 
-             /*   functions for switch statement  */
+/*   functions for switch statement  */
 
 function viewEmployees() {
   let query =
@@ -103,22 +103,54 @@ function viewByDepartment() {
     });
 }
 
-    //Still need to figure out how to populate the manager id and put into choices
-function viewByManager(){
-    inquirer
+//Still need to figure out how to populate the manager id and put into choices
+function viewByManager() {
+  inquirer
     .prompt({
-        name: "choice",
-        type: "list",
-        message: "Choose a manager",
-        choices: []
+      name: "choice",
+      type: "list",
+      message: "Choose a manager",
+      choices: []
     })
-    .then((answer) => {
-        let query = `Select employee.id, employee.first_name,employee.last_name, ? FROM employee `;
-        connection.query(query, [answer.choice],(err, res) => {
-            if(err) throw err;
-            console.log("\n");
-            console.table(res);
-        })
+    .then(answer => {
+      let query = `Select employee.id, employee.first_name,employee.last_name, ? FROM employee `;
+      connection.query(query, [answer.choice], (err, res) => {
+        if (err) throw err;
+        console.log("\n");
+        console.table(res);
+      });
+    });
+}
 
-    })
+function addEmployee() {
+  inquirer.prompt(
+    {
+      name: "firstName",
+      type: "input",
+      message: "What is your employees first name?"
+    },
+    {
+        name: "lastName",
+        type: 'input',
+        message: 'What is your employees last name?',
+    },
+    {
+        name: "role",
+        type: "list",
+        choices: ["Sales", "Engineering", "Finance"]
+    },
+    {
+        name: "manager",
+        type: 'list',
+        message: `Who is your Employee's Manager?`,
+        choices: ["a", "b", "c"]
+    }
+
+  ).then((firstName, lastName, role, manager) => {
+      let query = `INSERT INTO employee(first_name, last_name)
+      VALUES (?, ?)`;
+      connection.query(query,[firstName.firstName, lastName.lastName], (err, res)=> {
+          console.table(res);
+      } );
+  });
 }
