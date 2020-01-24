@@ -20,7 +20,7 @@ connection.connect(err => {
 function start() {
     inquirer
         .prompt({
-            name: "selection",
+            name: "action",
             type: "list",
             message: chalk.underline.rgb(255, 127, 0).bold("What would you like to do?"),
             choices: [
@@ -30,25 +30,54 @@ function start() {
                 "Add Employee",
                 "Remove Employee",
                 "Update Employee by role",
-                "Update Employee by Manager"
+                "Update Employee by Manager",
+                "exit"
             ]
         })
         .then(answer => {
-            if (answer.selection === "View all Employees") {
-                viewEmployees();
-            }
-            if(answer.selection === "View all Employees by Department"){
+            switch (answer.action) {
+                case "View all Employees":
+                    viewEmployees();
+                    break;
+
+                case "View all Employees by Department":
+                    viewByDepartment();
+
+                case "View all employees by Manager":
+                    viewByManager();
+                    break;
+
+                case "Add Employee":
+                    addEmployee();
+                    break;
+
+                case "Remove Employee":
+                    removeEmployee();
+
+                case "Update Employee by role":
+                    updateByRole();
+                    break;
+
+                case "Update Employee by Manager":
+                    updateByManager();
+                    break;
+
+                case "exit":
+                    connection.end();
+                    break;
 
             }
         });
 }
 
 function viewEmployees() {
-    connection.query(
-        "SELECT employee.id, employee.first_name,employee.last_name, department.names FROM employee INNER JOIN department ON employee.id=employee.id",
-     (err, res) =>
-         {
-        if (err) throw err;
+    let query = "SELECT id, first_name, last_name FROM employee";
+    connection.query(query, (err, res) => {
+        if(err) throw err;
+        console.log("\n");
         console.table(res);
-    });
+        console.log("\n");
+        start();  
+    });   
 }
+
