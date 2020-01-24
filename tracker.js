@@ -42,7 +42,7 @@ function start() {
 
                 case "View all Employees by Department":
                     viewByDepartment();
-
+                        break;
                 case "View all employees by Manager":
                     viewByManager();
                     break;
@@ -65,19 +65,36 @@ function start() {
                 case "exit":
                     connection.end();
                     break;
-
             }
         });
 }
 
+
 function viewEmployees() {
-    let query = "SELECT id, first_name, last_name FROM employee";
+    let query = "SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.names,roles.salary,employee.manager_id From employee INNER JOIN roles ON (employee.id = roles.id) INNER JOIN department ON (roles.id = department.id)";
     connection.query(query, (err, res) => {
-        if(err) throw err;
+        if (err) throw err;
         console.log("\n");
         console.table(res);
         console.log("\n");
-        start();  
-    });   
+        start();
+    });
 }
 
+function viewByDepartment(){
+    inquirer
+    .prompt({
+        name: "choice",
+        type: "list",
+        message: "Choose a department",
+        choices: ["Sales","Engineering","Finance"]
+    })
+    .then((answer) => {
+        let query = `Select employee.first_name,employee.last_name, department.names FROM employee INNER JOIN department ON (department.names = ?)`
+        connection.query(query, {choices: answer.choice}),
+        function(err,res){
+            if(err) throw err;
+            console.log(res);
+        }
+    });
+}
