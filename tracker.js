@@ -45,7 +45,7 @@ function start() {
         case "View all Employees by Department":
           viewByDepartment();
           break;
-        case "View all employees by Manager":
+        case "View all Employees by Manger":
           viewByManager();
           break;
 
@@ -74,8 +74,11 @@ function start() {
 /*   functions for switch statement  */
 
 function viewEmployees() {
-  let query =
-    "SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.names,roles.salary,employee.manager_id From employee INNER JOIN roles ON (employee.id = roles.id) INNER JOIN department ON (roles.id = department.id)";
+  let query = ` SELECT e.id, e.first_name, e.last_name, r.title,r.salary,d.names as department, CONCAT(m.first_name," ", m.last_name) as manager
+  FROM employee as e
+  INNER JOIN roles as r
+  ON (e.id = r.id) INNER JOIN department as d ON (r.id = d.id)
+  LEFT JOIN employee as m on m.id = e.manager_id ORDER BY e.id`;
   connection.query(query, (err, res) => {
     if (err) throw err;
     console.log("\n");
@@ -110,12 +113,13 @@ function viewByManager() {
       name: "choice",
       type: "list",
       message: "Choose a manager",
-      choices: []
+      choices: ["stephen", "tyler"]
     })
     .then(answer => {
-      let query = `Select employee.id, employee.first_name,employee.last_name, ? FROM employee `;
+      let query = `Select employee.id, employee.first_name,employee.last_name WHERE manager_id = ? FROM employee `;
       connection.query(query, [answer.choice], (err, res) => {
-        if (err) throw err;
+        if (err) throw new Error("Something Went wrong");
+
         console.log("\n");
         console.table(res);
       });
@@ -123,34 +127,41 @@ function viewByManager() {
 }
 
 function addEmployee() {
-  inquirer.prompt(
-    {
-      name: "firstName",
-      type: "input",
-      message: "What is your employees first name?"
-    },
-    {
+  inquirer
+    .prompt(
+      {
+        name: "firstName",
+        type: "input",
+        message: "What is your employees first name?"
+      },
+      {
         name: "lastName",
-        type: 'input',
-        message: 'What is your employees last name?',
-    },
-    {
+        type: "input",
+        message: "What is your employees last name?"
+      },
+      {
         name: "role",
         type: "list",
         choices: ["Sales", "Engineering", "Finance"]
-    },
-    {
+      },
+      {
         name: "manager",
-        type: 'list',
+        type: "list",
         message: `Who is your Employee's Manager?`,
         choices: ["a", "b", "c"]
-    }
-
-  ).then((firstName, lastName, role, manager) => {
+      }
+    )
+    .then((firstName, lastName, role, manager) => {
       let query = `INSERT INTO employee(first_name, last_name)
-      VALUES (?, ?)`;
-      connection.query(query,[firstName.firstName, lastName.lastName], (err, res)=> {
+      VALUES (?, ?) FROM employee`;
+      connection.query(
+        query,
+        [firstName.firstName, lastName.lastName],
+        (err, res) => {
           console.table(res);
-      } );
-  });
+        }
+      );
+    });
 }
+
+// SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.names,roles.salary,employee.manager_id From employee INNER JOIN roles ON (employee.id = roles.id) INNER JOIN department ON (roles.id = department.id)

@@ -61,3 +61,31 @@ VALUES ("Accountant", 110000);
 
 
 SELECT * from roles;
+
+USE Employee_Tracker;
+
+SELECT e.id,e.first_name, m.id,m.first_name
+FROM employee as e
+LEFT JOIN employee m on e.manager_id = m.id;
+
+UPDATE employee 
+SET manager_id = 1
+WHERE id = 3;
+
+USE Employee_Tracker;
+SELECT e.id, e.first_name, e.last_name, roles.title
+FROM employee as e
+LEFT JOIN employee  on e.role_id = roles.title
+
+UPDATE roles 
+SET title = "Lead Engineer"
+WHERE id = 1;
+
+
+--  Main query
+SELECT e.id, e.first_name, e.last_name, r.title,r.salary,d.names as department, CONCAT(m.first_name," ", m.last_name) as manager
+FROM employee as e
+INNER JOIN roles as r
+ON (e.id = r.id) INNER JOIN department as d ON (r.id = d.id)
+LEFT JOIN employee as m on m.id = e.manager_id ORDER BY e.id;
+-- Main query
