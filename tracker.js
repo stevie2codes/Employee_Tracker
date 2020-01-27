@@ -115,15 +115,18 @@ function viewByManager() {
       name: "choice",
       type: "list",
       message: "Choose a manager",
-      choices: ["stephen", "tyler"]
+      choices: ["stephen", "tyler", "Tommy"]
     })
     .then(answer => {
-      let query = `Select employee.id, employee.first_name,employee.last_name WHERE manager_id = ? FROM employee `;
+      let query = `Select CONCAT(e.first_name, " ", e.last_name) as Employee,
+      CONCAT(m.first_name," ", m.last_name) as Manager
+      FROM employee as e 
+      INNER JOIN employee as m ON e.manager_id = m.id `;
       connection.query(query, [answer.choice], (err, res) => {
-        if (err) throw new Error("Something Went wrong");
-
+        if (err) throw err;
         console.log("\n");
         console.table(res);
+        start();
       });
     });
 }
