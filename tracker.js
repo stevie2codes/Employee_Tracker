@@ -76,7 +76,7 @@ function start() {
 function viewEmployees() {
   let query = ` SELECT e.id, e.first_name, e.last_name, r.title,r.salary,d.names as department, CONCAT(m.first_name," ", m.last_name) as manager
   FROM employee as e
-  INNER JOIN roles as r
+  LEFT JOIN roles as r
   ON (e.id = r.id) INNER JOIN department as d ON (r.id = d.id)
   LEFT JOIN employee as m on m.id = e.manager_id ORDER BY e.id`;
   connection.query(query, (err, res) => {
@@ -96,7 +96,9 @@ function viewByDepartment() {
       choices: ["Sales", "Engineering", "Finance"]
     })
     .then(answer => {
-      let query = `Select employee.id, employee.first_name,employee.last_name, department.names FROM employee INNER JOIN department ON (employee.id = department.id) WHERE names = ?`;
+      let query = `Select e.id, e.first_name,e.last_name, d.names as department
+      FROM employee as e 
+      INNER JOIN department as d ON (e.id = d.id) WHERE d.names = ?`;
       connection.query(query, [answer.choice], (err, res) => {
         if (err) throw err;
         console.log("\n");
