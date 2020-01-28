@@ -55,6 +55,7 @@ function start() {
 
         case "Remove Employee":
           removeEmployee();
+          break;
 
         case "Update Employee by role":
           updateByRole();
@@ -108,7 +109,6 @@ function viewByDepartment() {
     });
 }
 
-//Still need to figure out how to populate the manager id and put into choices
 function viewByManager() {
   inquirer
     .prompt({
@@ -132,41 +132,92 @@ function viewByManager() {
 }
 
 function addEmployee() {
-  inquirer
-    .prompt(
-      {
-        name: "firstName",
-        type: "input",
-        message: "What is your employees first name?"
-      },
-      {
-        name: "lastName",
-        type: "input",
-        message: "What is your employees last name?"
-      },
-      {
-        name: "role",
-        type: "list",
-        choices: ["Sales", "Engineering", "Finance"]
-      },
-      {
-        name: "manager",
-        type: "list",
-        message: `Who is your Employee's Manager?`,
-        choices: ["a", "b", "c"]
-      }
-    )
-    .then((firstName, lastName, role, manager) => {
-      let query = `INSERT INTO employee(first_name, last_name)
-      VALUES (?, ?) FROM employee`;
-      connection.query(
-        query,
-        [firstName.firstName, lastName.lastName],
-        (err, res) => {
-          console.table(res);
+  connection.query(`SELECT * FROM roles`, function(err, result) {
+    if (err) throw err;
+
+    inquirer
+      .prompt([
+        {
+          name: "firstName",
+          type: "input",
+          message: "What is your employees first name?"
+        },
+        {
+          name: "lastName",
+          type: "input",
+          message: "What is your employees last name?"
+        },
+        {
+          name: "role",
+          type: "list",
+          choices: function() {
+            let choiceArray = [];
+            for (let i = 0; i < result.length; i++) {
+              choiceArray.push(result[i].title);
+            }
+            return choiceArray;
+          }
         }
-      );
-    });
+      ])
+      .then(answer => {
+        let chosenItem = "";
+        for (let i = 0; i < result.length; i++) {
+          if (result[i].title === answer.role) {
+            chosenItem = parseInt(result[i].id);
+          }
+        }
+        let query = `
+     INSERT INTO employee(first_name, last_name, role_id)
+      VALUES (?, ?, ?)`;
+        connection.query(
+          query,
+          [answer.firstName, answer.lastName, chosenItem],
+          (err, res) => {
+            if (err) throw err;
+            console.log(`New Employee added`);
+            start();
+          }
+        );
+      });
+  });
 }
 
-// SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.names,roles.salary,employee.manager_id From employee INNER JOIN roles ON (employee.id = roles.id) INNER JOIN department ON (roles.id = department.id)
+function removeEmployee() {
+  connection.query(`SELECT * FROM employee `, function(err, result) {
+    if (err) throw err;
+
+    inquirer
+      .prompt([
+        {
+          name: "choice",
+          type: "list",
+          message: "choose and employee to remove",
+          choices: function() {
+            let choiceArray = [];
+            for (let i = 0; i < result.length; i++) {
+              choiceArray.push(result[i].first_name);
+            }
+            return choiceArray;
+          }
+        }
+      ])
+      .then(answer => {
+        removedUser = "";
+        for (let i = 0; i < result.length; i++) {
+          if (result[i].first_name === answer.choice) {
+            removedUser = parseInt(result[i].id);
+          }
+        }
+
+        let query = `DELETE FROM employee  WHERE id = ?`;
+        connection.query(query, [removedUser]),
+          (err, res) => {
+            if (err) throw err;
+            console.log(`\n`);
+            console.log("Employee has been removed");
+           
+          };
+          start();
+      });
+  });
+}
