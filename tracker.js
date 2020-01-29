@@ -1,8 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const chalk = require("chalk");
-const cTable = require("console.table");
-const chalkTable = chalk.bold.bgGreenBright.red;
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -95,7 +93,9 @@ function viewByDepartment() {
     .prompt({
       name: "choice",
       type: "list",
-      message: "Choose a department",
+      message: chalk.underline
+        .red
+        .bold("Choose a Department"),
       choices: ["Sales", "Engineering", "Finance"]
     })
     .then(answer => {
@@ -116,7 +116,9 @@ function viewByManager() {
     .prompt({
       name: "choice",
       type: "list",
-      message: "Choose a manager",
+      message: chalk.underline
+      .red
+      .bold("Choose a Manager"),
       choices: ["stephen", "tyler", "Tommy"]
     })
     .then(answer => {
@@ -141,16 +143,23 @@ function addEmployee() {
       .prompt([{
           name: "firstName",
           type: "input",
-          message: "What is your employees first name?"
+          message: chalk
+          .red
+          .italic("What is your employees first name?")
         },
         {
           name: "lastName",
           type: "input",
-          message: "What is your employees last name?"
+          message: chalk
+          .greenBright
+          .italic("What is your employees last name?")
         },
         {
           name: "role",
           type: "list",
+          message: chalk
+          .yellowBright
+          .italic("In which department should your employee be placed?"),
           choices: function () {
             let choiceArray = [];
             for (let i = 0; i < result.length; i++) {
