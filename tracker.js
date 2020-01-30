@@ -138,7 +138,7 @@ function viewByManager() {
 function addEmployee() {
   connection.query(`SELECT * FROM roles`, function (err, result) {
     if (err) throw err;
-
+    
     inquirer
       .prompt([{
           name: "firstName",
@@ -159,7 +159,7 @@ function addEmployee() {
           type: "list",
           message: chalk
           .yellowBright
-          .italic("In which department should your employee be placed?"),
+          .italic("What is your employee's role?"),
           choices: function () {
             let choiceArray = [];
             for (let i = 0; i < result.length; i++) {
@@ -167,7 +167,7 @@ function addEmployee() {
             }
             return choiceArray;
           }
-        }
+        },
       ])
       .then(answer => {
         let chosenItem = "";
@@ -184,10 +184,40 @@ function addEmployee() {
           [answer.firstName, answer.lastName, chosenItem],
           (err, res) => {
             if (err) throw err;
-            console.log(`New Employee added`);
-            start();
           }
         );
+      }).then(manager => {
+        let query = `Select * FROM employee`;
+        connection.query(query, (err,result)=>{
+          if(err) throw err;
+        
+          inquirer.prompt([
+            {
+              name: "manager",
+              type: "list",
+              message: chalk
+              .magentaBright
+              .italic("Who is your new employee's manager?"),
+            choices:function(){
+              let manArr = [];
+              for(let i = 0; i < result.length; i++){
+                manArr.push(result[i].first_name +" "+ result[i].last_name +"_"+ result[i].id);
+              }
+              return manArr;
+            }
+            } 
+          ]).then(input=>{
+            let string = input.manager;
+            let splitResult = parseInt(string.split("_").pop());
+
+              console.log(typeof(splitResult));
+            connection.query(`INSERT INTO employee SET manager_id = ?`,[splitResult], function(err,res){
+              if(err) throw err;
+              console.log("sucess");
+              start();
+            })
+          })
+        });
       });
   });
 }
