@@ -117,8 +117,8 @@ function viewByManager() {
       name: "choice",
       type: "list",
       message: chalk.underline
-      .red
-      .bold("Choose a Manager"),
+        .red
+        .bold("Choose a Manager"),
       choices: ["stephen", "tyler", "Tommy"]
     })
     .then(answer => {
@@ -136,89 +136,78 @@ function viewByManager() {
 }
 
 function addEmployee() {
-  connection.query(`SELECT * FROM roles`, function (err, result) {
+  connection.query(`SELECT * FROM roles `, function (err, result) {
     if (err) throw err;
-    
-    inquirer
-      .prompt([{
-          name: "firstName",
-          type: "input",
-          message: chalk
-          .red
-          .italic("What is your employees first name?")
-        },
-        {
-          name: "lastName",
-          type: "input",
-          message: chalk
-          .greenBright
-          .italic("What is your employees last name?")
-        },
-        {
-          name: "role",
-          type: "list",
-          message: chalk
-          .yellowBright
-          .italic("What is your employee's role?"),
-          choices: function () {
-            let choiceArray = [];
-            for (let i = 0; i < result.length; i++) {
-              choiceArray.push(result[i].title);
+    connection.query(`SELECT * FROM employee`, function (err, response) {
+      if (err) throw err;
+
+      inquirer
+        .prompt([{
+            name: "firstName",
+            type: "input",
+            message: chalk
+              .red
+              .italic("What is your employees first name?")
+          },
+          {
+            name: "lastName",
+            type: "input",
+            message: chalk
+              .greenBright
+              .italic("What is your employees last name?")
+          },
+          {
+            name: "role",
+            type: "list",
+            message: chalk
+              .yellowBright
+              .italic("What is your employee's role?"),
+            choices: function () {
+              let choiceArray = [];
+              for (let i = 0; i < result.length; i++) {
+                choiceArray.push(result[i].title);
+              }
+              return choiceArray;
             }
-            return choiceArray;
-          }
-        },
-      ])
-      .then(answer => {
-        let chosenItem = "";
-        for (let i = 0; i < result.length; i++) {
-          if (answer.role === result[i].title) {
-            chosenItem = parseInt(result[i].id);
-          }
-        }
-        let query = `
-     INSERT INTO employee(first_name, last_name, role_id)
-      VALUES (?, ?, ?)`;
-        connection.query(
-          query,
-          [answer.firstName, answer.lastName, chosenItem],
-          (err, res) => {
-            if (err) throw err;
-          }
-        );
-      }).then(manager => {
-        let query = `Select * FROM employee`;
-        connection.query(query, (err,result)=>{
-          if(err) throw err;
-        
-          inquirer.prompt([
-            {
-              name: "manager",
-              type: "list",
-              message: chalk
+          },
+          {
+            name: "manager",
+            type: "list",
+            message: chalk
               .magentaBright
               .italic("Who is your new employee's manager?"),
-            choices:function(){
+            choices: function () {
               let manArr = [];
-              for(let i = 0; i < result.length; i++){
-                manArr.push(result[i].first_name +" "+ result[i].last_name +"_"+ result[i].id);
+              for (let i = 0; i < response.length; i++) {
+                manArr.push(response[i].first_name + " " + response[i].last_name + "_" + response[i].id);
               }
               return manArr;
             }
-            } 
-          ]).then(input=>{
-            let string = input.manager;
-            let splitResult = parseInt(string.split("_").pop());
-
-              console.log(typeof(splitResult));
-            connection.query(`INSERT INTO employee SET manager_id = ?`,[splitResult], function(err,res){
-              if(err) throw err;
-              console.log("sucess");
+          }
+        ])
+        .then(answer => {
+          let string = answer.manager;
+          let splitResult = parseInt(string.split("_").pop());
+          let chosenItem = "";
+          for (let i = 0; i < result.length; i++) {
+            if (answer.role === result[i].title) {
+              chosenItem = parseInt(result[i].id);
+            }
+          }
+          let query = `
+     INSERT INTO employee(first_name, last_name, role_id, manager_id)
+      VALUES (?, ?, ?,?)`;
+          connection.query(
+            query,
+            [answer.firstName, answer.lastName, chosenItem, splitResult],
+            (err, res) => {
+              if (err) throw err;
+              console.log("New Employee added to database!");
               start();
-            })
-          })
+            }
+          );
         });
-      });
+    });
   });
 }
 
@@ -251,10 +240,10 @@ function removeEmployee() {
         connection.query(query, [removedUser]),
           (err, res) => {
             if (err) throw err;
-          
+
           };
-          console.log("Employee has been removed");
-        
+        console.log("Employee has been removed");
+
         start();
       });
   });
@@ -280,7 +269,7 @@ function updateByRole() {
                 let employeeArray = [];
                 for (let i = 0; i < response.length; i++) {
                   employeeArray.push(
-                    response[i].first_name + " " + response[i].last_name 
+                    response[i].first_name + " " + response[i].last_name
                   );
                 }
                 return employeeArray;
@@ -300,19 +289,19 @@ function updateByRole() {
             }
           ])
           .then(answer => {
-            connection.query(`SELECT id FROM roles WHERE ?`,
-            {
-              title: answer.role
-            },
-            function(err,res){
-              if(err)throw err;
-           connection.query(`UPDATE roles SET title = ? WHERE id = ?`,[answer.role, res[0].id]),function(err,res){
-             if(err) throw err;
-             console.log("success");
-             start();
-           }
-            })
-         
+            connection.query(`SELECT id FROM roles WHERE ?`, {
+                title: answer.role
+              },
+              function (err, res) {
+                if (err) throw err;
+                connection.query(`UPDATE roles SET title = ? WHERE id = ?`, [answer.role, res[0].id]),
+                  function (err, res) {
+                    if (err) throw err;
+                    console.log("success");
+                    start();
+                  }
+              })
+
           });
       }
     );
