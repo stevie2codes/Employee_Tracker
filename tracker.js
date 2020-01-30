@@ -6,7 +6,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root", //connecting to DataBase
-  password: "$Webb001",
+  password: "MyNewPass",
   database: "Employee_Tracker"
 });
 // IF (connection) start program

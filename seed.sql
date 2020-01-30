@@ -82,7 +82,7 @@ SET title = "Lead Engineer"
 WHERE id = 1;
 
 
---  Main query
+--  Main query For all employees
 SELECT e.id, e.first_name, e.last_name, r.title,r.salary,d.names as department, CONCAT(m.first_name," ", m.last_name) as manager
 FROM employee as e
 INNER JOIN roles as r
