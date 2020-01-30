@@ -89,6 +89,9 @@ function viewEmployees() {
 }
 
 function viewByDepartment() {
+  let query = `SELECT * FROM department`;
+  connection.query(query, (err,name)=> {
+    if (err)throw err; 
   inquirer
     .prompt({
       name: "choice",
@@ -96,19 +99,25 @@ function viewByDepartment() {
       message: chalk.underline
         .red
         .bold("Choose a Department"),
-      choices: ["Sales", "Engineering", "Finance"]
+      choices:function(){
+        let nameArr = [];
+        for(let i = 0; i < name.length; i++){
+          nameArr.push(name[i].names);
+        }
+        return nameArr;
+      }
     })
     .then(answer => {
-      let query = `Select e.id, e.first_name,e.last_name, d.names as department
+      let query =` Select e.id, e.first_name,e.last_name, d.names as department
       FROM employee as e 
-      INNER JOIN department as d ON (e.id = d.id) WHERE d.names = ?`;
-      connection.query(query, [answer.choice], (err, res) => {
-        if (err) throw err;
-        console.log("\n");
-        console.table(res);
-      });
-      start();
+      INNER JOIN department as d ON (e.id = d.id) WHERE d.names = ?`
+     connection.query(query, [answer.choice],(err,res)=>{
+       if(err) throw err;
+       console.table(res);
+       start();
+     });      
     });
+  });
 }
 
 function viewByManager() {
@@ -298,10 +307,10 @@ function updateByRole() {
                   function (err, res) {
                     if (err) throw err;
                     console.log("success");
-                    start();
+                    
                   }
+                  start();
               })
-
           });
       }
     );
