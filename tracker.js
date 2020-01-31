@@ -90,33 +90,31 @@ function viewEmployees() {
 
 function viewByDepartment() {
   let query = `SELECT * FROM department`;
-  connection.query(query, (err,name)=> {
-    if (err)throw err; 
-  inquirer
-    .prompt({
-      name: "choice",
-      type: "list",
-      message: chalk.underline
-        .red
-        .bold("Choose a Department"),
-      choices:function(){
-        let nameArr = [];
-        for(let i = 0; i < name.length; i++){
-          nameArr.push(name[i].names);
+  connection.query(query, (err, name) => {
+    if (err) throw err;
+    inquirer
+      .prompt({
+        name: "choice",
+        type: "list",
+        message: chalk.underline.red.bold("Choose a Department"),
+        choices: function() {
+          let nameArr = [];
+          for (let i = 0; i < name.length; i++) {
+            nameArr.push(name[i].names);
+          }
+          return nameArr;
         }
-        return nameArr;
-      }
-    })
-    .then(answer => {
-      let query =` Select e.id, e.first_name,e.last_name, d.names as department
+      })
+      .then(answer => {
+        let query = ` Select e.id, e.first_name,e.last_name, d.names as department
       FROM employee as e 
-      INNER JOIN department as d ON (e.id = d.id) WHERE d.names = ?`
-     connection.query(query, [answer.choice],(err,res)=>{
-       if(err) throw err;
-       console.table(res);
-       start();
-     });      
-    });
+      INNER JOIN department as d ON (e.id = d.id) WHERE d.names = ?`;
+        connection.query(query, [answer.choice], (err, res) => {
+          if (err) throw err;
+          console.table(res);
+          start();
+        });
+      });
   });
 }
 
@@ -125,9 +123,7 @@ function viewByManager() {
     .prompt({
       name: "choice",
       type: "list",
-      message: chalk.underline
-        .red
-        .bold("Choose a Manager"),
+      message: chalk.underline.red.bold("Choose a Manager"),
       choices: ["stephen", "tyler", "Tommy"]
     })
     .then(answer => {
@@ -145,33 +141,30 @@ function viewByManager() {
 }
 
 function addEmployee() {
-  connection.query(`SELECT * FROM roles `, function (err, result) {
+  connection.query(`SELECT * FROM roles `, function(err, result) {
     if (err) throw err;
-    connection.query(`SELECT * FROM employee`, function (err, response) {
+    connection.query(`SELECT * FROM employee`, function(err, response) {
       if (err) throw err;
 
       inquirer
-        .prompt([{
+        .prompt([
+          {
             name: "firstName",
             type: "input",
-            message: chalk
-              .red
-              .italic("What is your employees first name?")
+            message: chalk.red.italic("What is your employees first name?")
           },
           {
             name: "lastName",
             type: "input",
-            message: chalk
-              .greenBright
-              .italic("What is your employees last name?")
+            message: chalk.greenBright.italic(
+              "What is your employees last name?"
+            )
           },
           {
             name: "role",
             type: "list",
-            message: chalk
-              .yellowBright
-              .italic("What is your employee's role?"),
-            choices: function () {
+            message: chalk.yellowBright.italic("What is your employee's role?"),
+            choices: function() {
               let choiceArray = [];
               for (let i = 0; i < result.length; i++) {
                 choiceArray.push(result[i].title);
@@ -182,13 +175,19 @@ function addEmployee() {
           {
             name: "manager",
             type: "list",
-            message: chalk
-              .magentaBright
-              .italic("Who is your new employee's manager?"),
-            choices: function () {
+            message: chalk.magentaBright.italic(
+              "Who is your new employee's manager?"
+            ),
+            choices: function() {
               let manArr = [];
               for (let i = 0; i < response.length; i++) {
-                manArr.push(response[i].first_name + " " + response[i].last_name + "_" + response[i].id);
+                manArr.push(
+                  response[i].first_name +
+                    " " +
+                    response[i].last_name +
+                    "_" +
+                    response[i].id
+                );
               }
               return manArr;
             }
@@ -221,26 +220,33 @@ function addEmployee() {
 }
 
 function removeEmployee() {
-  connection.query(`SELECT * FROM employee `, function (err, result) {
+  connection.query(`SELECT * FROM employee `, function(err, result) {
     if (err) throw err;
 
     inquirer
-      .prompt([{
-        name: "choice",
-        type: "list",
-        message: "choose an employee to remove",
-        choices: function () {
-          let choiceArray = [];
-          for (let i = 0; i < result.length; i++) {
-            choiceArray.push(result[i].first_name + " " + result[i].last_name);
+      .prompt([
+        {
+          name: "choice",
+          type: "list",
+          message: "choose an employee to remove",
+          choices: function() {
+            let choiceArray = [];
+            for (let i = 0; i < result.length; i++) {
+              choiceArray.push(
+                result[i].first_name + " " + result[i].last_name
+              );
+            }
+            return choiceArray;
           }
-          return choiceArray;
         }
-      }])
+      ])
       .then(answer => {
         removedUser = "";
         for (let i = 0; i < result.length; i++) {
-          if (result[i].first_name + " " + result[i].last_name === answer.choice) {
+          if (
+            result[i].first_name + " " + result[i].last_name ===
+            answer.choice
+          ) {
             removedUser = parseInt(result[i].id);
           }
         }
@@ -249,7 +255,6 @@ function removeEmployee() {
         connection.query(query, [removedUser]),
           (err, res) => {
             if (err) throw err;
-
           };
         console.log("Employee has been removed");
 
@@ -268,17 +273,21 @@ function updateByRole() {
   ON e.role_id = r.id`,
       (err, response) => {
         if (err) throw err;
-
         inquirer
-          .prompt([{
+          .prompt([
+            {
               name: "employee",
               type: "list",
               message: "choose an employee to update",
-              choices: function () {
+              choices: function() {
                 let employeeArray = [];
                 for (let i = 0; i < response.length; i++) {
                   employeeArray.push(
-                    response[i].first_name + " " + response[i].last_name
+                    response[i].first_name +
+                      " " +
+                      response[i].last_name +
+                      "_" +
+                      response[i].id
                   );
                 }
                 return employeeArray;
@@ -288,7 +297,7 @@ function updateByRole() {
               name: "role",
               type: "list",
               message: "Choose a new role for this employee",
-              choices: function () {
+              choices: function() {
                 let roleArr = [];
                 for (let i = 0; i < roleType.length; i++) {
                   roleArr.push(roleType[i].title);
@@ -298,19 +307,20 @@ function updateByRole() {
             }
           ])
           .then(answer => {
-            connection.query(`SELECT id FROM roles WHERE ?`, {
-                title: answer.role
-              },
-              function (err, res) {
+            let split = answer.employee.split("_").pop();
+            let numSplit = parseInt(split);
+            console.log(split);
+            connection.query(
+              `UPDATE roles SET title = ? WHERE id = ? `,
+              [answer.role, numSplit],
+              function(err, res) {
                 if (err) throw err;
-                connection.query(`UPDATE roles SET title = ? WHERE id = ?`, [answer.role, res[0].id]),
-                  function (err, res) {
-                    if (err) throw err;
-                    console.log("success");
-                    
-                  }
-                  start();
-              })
+                console.log(
+                  `Changed Role for ${answer.employee} to ${answer.role}`
+                );
+                start();
+              }
+            );
           });
       }
     );
