@@ -29,8 +29,8 @@ function start() {
         "View all Employees by Manger",
         "Add Employee",
         "Remove Employee",
-        "Update Employee by role",
-        "Update Employee by Manager",
+        "Update Employee's role",
+        "Update Employee's Manager",
         "exit"
       ]
     }) /* User Input will activate a function from switch statement */
@@ -55,11 +55,11 @@ function start() {
           removeEmployee();
           break;
 
-        case "Update Employee by role":
+        case "Update Employee's role":
           updateByRole();
           break;
 
-        case "Update Employee by Manager":
+        case "Update Employee's Manager":
           updateByManager();
           break;
 
@@ -325,4 +325,58 @@ function updateByRole() {
       }
     );
   });
+}
+
+function updateByManager(){
+  let query = `Select CONCAT(e.first_name, " ", e.last_name) as Employee, e.id,e.manager_id,
+  CONCAT(m.first_name," ", m.last_name) as Manager
+  FROM employee as e 
+  INNER JOIN employee as m ON e.manager_id = m.id `;
+  connection.query(query, (err,data)=>{
+    // console.log(data);
+    inquirer.prompt([
+      {
+        name: "employee",
+        type: "list",
+        message: chalk.bold.underline.blueBright("Select an employee"),
+        choices: function(){
+          let dataArray = [];
+          for(let i = 0; i < data.length; i++){
+            dataArray.push(data[i].Employee);
+          }
+          return dataArray;
+        }
+      },
+      {
+        name: "manager",
+        type: "list",
+        message: chalk.underline.bold.magentaBright("Select a new Manager for this employee"),
+        choices: function(){
+          managerArray = [];
+          for(let i = 0; i < data.length; i++){
+            managerArray.push(data[i].Manager);
+          }
+          return managerArray;
+        }
+      }
+    ]).then(result =>{
+      console.log(result.employee);
+      let query = `UPDATE employee SET manager_id = ? WHERE id = ? `;
+      for(let i = 0 ; i < data.length; i++){
+        if(data[i].Employee === result.employee){
+          connection.query(query,[data[i].manager_id, data[i].id],(err,res)=>{
+            if(err){
+              throw err;
+            } 
+          }
+          );
+        }
+      }  
+      console.log("New manager Updated!");
+      start();
+    })
+
+  })
+  
+
 }

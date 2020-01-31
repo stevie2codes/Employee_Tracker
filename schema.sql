@@ -1,4 +1,4 @@
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass';
+
 
 DROP DATABASE IF EXISTS Employee_Tracker;
 
@@ -19,6 +19,7 @@ CREATE TABLE roles(
     department_id INT,
     PRIMARY KEY (id),
     FOREIGN KEY (department_id) REFERENCES department(id)
+    
 );
 
 CREATE TABLE employee(
@@ -30,8 +31,8 @@ CREATE TABLE employee(
     PRIMARY KEY (id),
      FOREIGN KEY (role_id) REFERENCES roles (id),
     FOREIGN KEY (manager_id) REFERENCES employee (id)
+    ON DELETE CASCADE
 );
-
 
 
 

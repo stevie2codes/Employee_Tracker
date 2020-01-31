@@ -1,5 +1,3 @@
-
---------Department--------------
 INSERT INTO department(names)
 VALUES ("Sales");
 
@@ -10,9 +8,9 @@ INSERT INTO department(names)
 VALUES ("Finance");
 
 INSERT INTO department(names)
-VALUES ("Legal")
+VALUES ("Legal");
 
------------------------Roles------------------
+
 INSERT INTO roles(title, salary, department_id)
 VALUES ("Sales Lead", 20000, 1);
 INSERT INTO roles(title, salary, department_id)
@@ -30,27 +28,27 @@ INSERT INTO roles(title, salary, department_id)
 VALUES ("Lawyer", 210000, 4);
 
 
-------Employees-----------------
+
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Stephen', 'Webb',1,null);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ('Robert', 'Paulson',1, 1);
+VALUES ('Robert', 'Paulson',1, 2);
 
 INSERT INTO employee (first_name, last_name,role_id, manager_id)
-VALUES ('Tyler', 'Durden',2,3);
+VALUES ('Tyler', 'Durden',2, 1);
 
 INSERT INTO employee (first_name, last_name,role_id, manager_id)
-VALUES ('Marla', 'Singer',3, null);
+VALUES ('Marla', 'Singer',3, 4);
 
 INSERT INTO employee (first_name, last_name,role_id, manager_id)
-VALUES ('Aurthor', 'Shelby',4, 3);
+VALUES ('Aurthor', 'Shelby',4, 2);
 
 INSERT INTO employee (first_name, last_name,role_id, manager_id)
-VALUES ('Tommy', 'Shelby',3, 1);
+VALUES ('Tommy', 'Shelby',3, 3);
 
 INSERT INTO employee (first_name, last_name,role_id, manager_id)
-VALUES ('Don', 'Jonson',4, 3);
+VALUES ('Don', 'Jonson',4, 1);
 
 
 
